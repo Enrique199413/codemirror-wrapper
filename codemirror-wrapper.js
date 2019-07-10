@@ -1,5 +1,19 @@
 import {html, PolymerElement} from '../@polymer/polymer/polymer-element.js';
+<<<<<<< HEAD
+=======
+
+const CodeMirror = (async () => {
+  const _codeMirror = '../codemirror/src/codemirror.js';
+  const module = await import(_codeMirror);
+  return module.default;
+})();
+// import 'codemirror/mode/javascript/javascript';
+>>>>>>> master
 /**
+ *
+ <script src="../node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+ <script src="../node_modules/codemirror/mode/clike/clike.js"></script>
+ <script src="../node_modules/codemirror/mode/javascript/javascript.js"></script>
  * `codemirror-wrapper`
  * 
  *
@@ -19,62 +33,86 @@ class CodemirrorWrapper extends PolymerElement {
           display: block;
           min-width: 400px;
         }
+        
+        textarea[hide] {
+          display: none;
+        }
       </style>
-      <h2>Prueba codemirror</h2>
-      <textarea id="textArea"></textarea>
+      
+      <textarea id="textArea" hide$="[[loadingEditor]]"></textarea>
+      [[editorText]]
     `;
   }
   static get properties() {
     return {
-      valorCorrecto: {
+      code: {
         type: String,
-        value: 'function myScript(){return 100;} jg',
         reflectToAttribute: true,
         observer: '_changeValueOnTextArea'
       },
-      outCode: {
+      editorText: {
         type: String,
-        value: '',
         notify: true
+      },
+      CodeMirror: {
+        type: Object,
+        observer: '_readyToPlay'
+      },
+      editor: {
+        type: Object,
+        observer: '_readyToPlayWithEditor'
+      },
+      loadingEditor: {
+        type: Boolean,
+        value: true
       }
     };
   }
 
-  _changeValueOnTextArea(newValue) {
-    setTimeout(() => {
-      this.editor.setValue(newValue);
-    }, 0);
-    console.log(newValue);
+  _changeValueOnTextArea(code) {
+    if (this.editor) {
+      this.editor.setValue(code);
+      this.editor.refresh();
+    }
+  }
+
+  _readyToPlayWithEditor() {
+    this.loadingEditor = false;
+    this.editor.setValue(this.code);
+    this.set('editorText', this.editor.getValue());
+  }
+
+  _readyToPlay(newValue) {
+    let options = {
+      mode:  "javascript",
+      lineNumbers: 'true',
+      lineWrapping: true,
+      lineSeparation: 'CRLF',
+      theme: 'material',
+      //readOnly: 'nocursor'
+      direction: 'ltr',
+      tabMode: 'indent'
+    };
+    this.set('editor', this.CodeMirror.fromTextArea(this.shadowRoot.querySelector('#textArea'), options));
+    this.editor.setSize('100%', '100%');
+    this.editor.on('changes', () => {
+      this.set('editorText', this.editor.getValue().replace(/\r?\n/g, "\n"));
+    })
+  }
+
+  _codeMirror() {
+    CodeMirror.then(solve => {
+      this.set('CodeMirror', solve);
+    });
   }
 
   connectedCallback() {
     super.connectedCallback();
-      let options = {
-        mode:  "javascript",
-        lineNumbers: 'true',
-        lineWrapping: true,
-        lineSeparation: 'CRLF',
-        theme: 'material',
-        //readOnly: 'nocursor'
-        direction: 'ltr',
-        tabMode: 'indent'
-      };
-      //CodeMirror(this.shadowRoot.querySelector('#textArea'), options);
-      this.set('editor', CodeMirror.fromTextArea(this.shadowRoot.querySelector('#textArea'), options));
-      this.editor.on('change', editor => {
-        //console.log(editor.getValue());
-        let valoresSpace = editor.getValue();
-        valoresSpace = valoresSpace.replace(/\r?\n/g, "\n");
-        this.set('outCode', valoresSpace);
-        console.log(this.outCode);
-        //this.set('outCode', editor.getValue());
-      });
-
-      this.editor.setSize('100%', '100%');
-      
-
+    this._codeMirror();
   }
-  
+
+
+
 }
 
 window.customElements.define('codemirror-wrapper', CodemirrorWrapper);
