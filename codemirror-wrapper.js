@@ -1,6 +1,16 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
+import {html, PolymerElement} from '../@polymer/polymer/polymer-element.js';
 
+const CodeMirror = (async () => {
+  const _codeMirror = '../codemirror/src/codemirror.js';
+  const module = await import(_codeMirror);
+  return module.default;
+})();
+// import 'codemirror/mode/javascript/javascript';
 /**
+ *
+ <script src="../node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+ <script src="../node_modules/codemirror/mode/clike/clike.js"></script>
+ <script src="../node_modules/codemirror/mode/javascript/javascript.js"></script>
  * `codemirror-wrapper`
  * 
  *
@@ -17,46 +27,80 @@ class CodemirrorWrapper extends PolymerElement {
         :host {
           display: block;
         }
+        
+        textarea[hide] {
+          display: none;
+        }
       </style>
-      <h2>Hello [[prop1]]!</h2>
-      <textarea id="textArea"></textarea>
-      <div id="code"></div>
+      
+      <textarea id="textArea" hide$="[[loadingEditor]]"></textarea>
+      [[editorText]]
     `;
   }
   static get properties() {
     return {
-      value: {
+      code: {
         type: String,
-        value: 'test-polytres',
-      },
-      valorCorrecto: {
-        type: String,
-        value: 'valorCorrecto;',
         reflectToAttribute: true,
         observer: '_changeValueOnTextArea'
+      },
+      editorText: {
+        type: String,
+        notify: true
+      },
+      CodeMirror: {
+        type: Object,
+        observer: '_readyToPlay'
+      },
+      editor: {
+        type: Object,
+        observer: '_readyToPlayWithEditor'
+      },
+      loadingEditor: {
+        type: Boolean,
+        value: true
       }
     };
   }
 
-  _changeValueOnTextArea(newValue) {
-    setTimeout(() => {
-      this.editor.setValue(newValue);
+  _changeValueOnTextArea(code) {
+    if (this.editor) {
+      this.editor.setValue(code);
+      this.editor.refresh();
+    }
+  }
 
-    }, 0);
+  _readyToPlayWithEditor() {
+    this.loadingEditor = false;
+    this.editor.setValue(this.code);
+    this.set('editorText', this.editor.getValue());
+  }
+
+  _readyToPlay(newValue) {
+    let options = {
+      mode:  "javascript",
+      lineNumbers: 'true',
+      theme: 'night'
+    };
+    this.set('editor', this.CodeMirror.fromTextArea(this.shadowRoot.querySelector('#textArea'), options));
+    this.editor.on('changes', () => {
+      this.set('editorText', this.editor.getValue());
+    })
+  }
+
+  _codeMirror() {
+    CodeMirror.then(solve => {
+      this.set('CodeMirror', solve);
+    });
   }
 
   connectedCallback() {
     super.connectedCallback();
-      let options = {
-        mode:  "javascript",
-        lineNumbers: 'true',
-        theme: 'night'
-      };
-      //CodeMirror(this.shadowRoot.querySelector('#textArea'), options);
-      this.set('editor', CodeMirror.fromTextArea(this.shadowRoot.querySelector('#textArea'), options));
-    
+    this._codeMirror();
   }
-  
+
+
+
 }
 
 window.customElements.define('codemirror-wrapper', CodemirrorWrapper);

@@ -7,12 +7,6 @@
     <title>codemirror-wrapper demo</title>
 
     <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
-    <link href="../node_modules/codemirror/lib/codemirror.css" rel="stylesheet">
-    <link href="../node_modules/codemirror/theme/night.css" rel="stylesheet">
-    <script src="../node_modules/codemirror/lib/codemirror.js"></script>
-    <script src="../node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
-    <script src="../node_modules/codemirror/mode/clike/clike.js"></script>
-    <script src="../node_modules/codemirror/mode/javascript/javascript.js"></script>
 
     <script type="module">
       import '@polymer/iron-demo-helpers/demo-pages-shared-styles';
@@ -31,7 +25,7 @@
       <h3>Basic codemirror-wrapper demo</h3>
       <demo-snippet>
         <template>
-          <codemirror-wrapper value="function myScript(){return 100;}"></codemirror-wrapper>
+          <codemirror-wrapper code="function myScript(){return 100;}"></codemirror-wrapper>
         </template>
       </demo-snippet>
     </div>
