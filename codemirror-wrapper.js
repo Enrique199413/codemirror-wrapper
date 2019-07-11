@@ -1,24 +1,16 @@
 import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
-
 const CodeMirror = (async () => {
   const _codeMirror = '../codemirror/src/codemirror.js';
-  const _codeMirrorJS = '../codemirror/mode/javascript/javascript.js';
   const module = await import(_codeMirror);
-  const moduleJS = await import(_codeMirrorJS);
-
   return module.default;
 })();
-window.CodeMirror = CodeMirror;
-CodeMirror.then(codeMirror => {
-  console.log(codeMirror);
-})
 /**
  *
  <script src="../node_modules/codemirror/mode/htmlmixed/htmlmixed.js"></script>
  <script src="../node_modules/codemirror/mode/clike/clike.js"></script>
  <script src="../node_modules/codemirror/mode/javascript/javascript.js"></script>
  * `codemirror-wrapper`
- * 
+ *
  *
  * @customElement
  * @polymer
