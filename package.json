@@ -3,7 +3,7 @@
   "main": "codemirror-wrapper.js",
   "dependencies": {
     "@polymer/polymer": "^3.0.0",
-    "codemirror": "^5.48.4",
+    "codemirror": "^5.58.2",
     "lit-element": "^2.2.0"
   },
   "devDependencies": {
